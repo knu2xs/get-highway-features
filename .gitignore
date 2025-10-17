@@ -86,7 +86,7 @@ models/
 **/*.DS_Store
 
 # ignore arcgis specific files and folders
-arcgis/**/*
+arcgis/
 
 # make sure the environment is not included
 env/
