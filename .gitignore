@@ -75,9 +75,6 @@ target/
 # Spyder
 .spyproject/
 
-# arcigs stuff
-arcgis/
-
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
 
@@ -88,10 +85,8 @@ models/
 # Mac OS-specific storage files
 **/*.DS_Store
 
-# ignore the caches created for ArcMap
-arcgis/Index
-arcgis/ImportLog
-arcgis/.backups
+# ignore arcgis specific files and folders
+arcgis/**/*
 
 # make sure the environment is not included
 env/
