@@ -103,10 +103,8 @@ def get_network_lines_layer(
         logger.error(msg)
         raise ValueError(msg)
 
-    # create a feature layer from the edge features
-    lyr = arcpy.management.MakeFeatureLayer(
-        edge_features_path, out_layer="network_features_lyr", where_clause=sql_str
-    )[0]
+    # create a feature layer from the edge features with the where clause
+    lyr = arcpy.management.MakeFeatureLayer(edge_features_path, where_clause=sql_str)[0]
 
     logger.debug(
         f"Created layer from network dataset edges source: {edge_features_path}."

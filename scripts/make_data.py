@@ -78,7 +78,7 @@ if __name__ == '__main__':
     # make sure the output file geodatabase exists
     if not out_gdb.exists():
         logger.info(f'Creating output file geodatabase: {out_gdb}')
-        arcpy.management.CreateFileGDB(out_gdb.parent, out_gdb.name)
+        arcpy.management.CreateFileGDB(str(out_gdb.parent), out_gdb.name)
     else:
         logger.debug(f'Output file geodatabase already exists: {out_gdb}')
 
