@@ -3,6 +3,8 @@ title: Home
 ---
 # Get Highway Features 0.0.0 Documentation
 
+{% include "../../README.md" %}
+
 This is the documentation for Get Highway Features. All the Markdown (`md`) files in
 `./docsrc/mkdocs` become the documentation pages.
 

@@ -1,5 +1,6 @@
 # Get Highway Features
 
+<!--start-->
 Get highway features from ArcGIS network dataset.
 
 ## Getting Started
@@ -39,7 +40,7 @@ template streamlines a number of commands using the `make` command pattern.
 - `make docs` - Build the documentation using MkDocs from files in `./docsrc` and save the output in `./docs`.
 
 - `make test` - activates the environment created by the `make env` or `make env_clone` and runs all the tests in the 
-  `./testing` directory using PyTest. 
+  `./testing` directory using PyTest.
 
 ## BumpVersion Cliff Notes
 
@@ -52,6 +53,7 @@ If you want to...
 - update version with no breaking changes (minor version update), `bumpversion minor`
 - update version with breaking changes (major version update), `bumpversion major`
 - create a release (tagged in version control - Git), `bumpversion --tag release`
+<!--end-->
 
 <p><small>Project based on the <a target="_blank" href="https://github.com/knu2xs/cookiecutter-geoai">cookiecutter 
 GeoAI project template</a>. This template, in turn, is simply an extension and light modification of the 
