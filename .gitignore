@@ -76,7 +76,7 @@ target/
 .spyproject/
 
 # arcigs stuff
-arcgis/**/*
+arcgis/
 
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
