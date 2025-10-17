@@ -19,10 +19,12 @@ A copy of the license is available in the repository's
 LICENSE file.
 """
 from configparser import ConfigParser
-from datetime import datetime
+import datetime
 from pathlib import Path
 import importlib.util
 import sys
+
+import arcpy
 
 # path to the root of the project
 dir_prj = Path(__file__).parent.parent
@@ -41,30 +43,72 @@ if importlib.util.find_spec('get_highway_features') is None:
     sys.path.insert(0, str(src_dir))
 
 # import get_highway_features
-import get_highway_features
+from get_highway_features import get_network_line_endpoints, get_network_lines_midpoints
 from get_highway_features.utils import get_logger
 
 # read and configure 
 config = ConfigParser()
-config.read('config.ini')
+config.read(dir_prj / 'config' / 'config.ini')
 
 log_level = config.get('DEFAULT', 'LOG_LEVEL')
-input_data = dir_prj / config.get('DEFAULT', 'INPUT_DATA')
-output_data = dir_prj / config.get('DEFAULT', 'OUTPUT_DATA')
+network_dataset_path = config.get('DEFAULT', 'NETWORK_DATASET_PATH')
 
-# get datestring for file naming yyyymmddThhmmss
-date_string = datetime.now().strftime("%Y%m%dT%H%M%S")
+if __name__ == '__main__':
 
-# path to save log file
-log_dir = dir_prj / 'data' / 'logs'
+    # get datestring for file naming yyyymmddThhmmss
+    date_string = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
 
-if not log_dir.exists():
-    log_dir.mkdir(parents=True)
+    # path to save log file
+    log_dir = dir_prj / 'data' / 'logs'
 
-log_file = log_dir / f'{Path(__file__).stem}_{date_string}.log'
+    if not log_dir.exists():
+        log_dir.mkdir(parents=True)
 
-# use the log level from the config to set up logging
-logger = get_logger(logger_name=f"{Path(__file__).stem}", level=log_level)
+    log_file = log_dir / f'{Path(__file__).stem}_{date_string}.log'
 
-logger.info(f'Starting data processing for {dir_prj.name}')
-### Main processing - put your data processing code here ###
+    # use the log level from the config to set up logging
+    logger = get_logger(logger_name=f"{Path(__file__).stem}", level=log_level)
+
+    # make sure the output directory and file geodatabase exist
+    out_gdb = dir_prj / 'data' / 'processed' / 'processed.gdb'
+
+    # make sure the output directory exists
+    out_gdb.parent.mkdir(parents=True, exist_ok=True)
+
+    # make sure the output file geodatabase exists
+    if not out_gdb.exists():
+        logger.info(f'Creating output file geodatabase: {out_gdb}')
+        arcpy.management.CreateFileGDB(out_gdb.parent, out_gdb.name)
+    else:
+        logger.debug(f'Output file geodatabase already exists: {out_gdb}')
+
+    logger.info(f'Starting data processing for {dir_prj.name}')
+
+    # get the network line endpoints
+    endpoints_output = str(out_gdb / f'network_line_endpoints_{date_string}')
+    logger.info('Retrieving network line endpoints...')
+    endpoints_features = get_network_line_endpoints(
+        dataset_path=network_dataset_path,
+        output_features=endpoints_output
+    )
+    logger.info(f'Network line endpoints saved to: {endpoints_features}')
+
+    # get the network line midpoints
+    midpoints_output = str(out_gdb / f'network_line_midpoints_{date_string}')
+    logger.info('Retrieving network line midpoints...')
+    midpoints_features = get_network_lines_midpoints(
+        dataset_path=network_dataset_path,
+        output_features=midpoints_output
+    )
+    logger.info(f'Network line midpoints saved to: {midpoints_features}')
+
+    # rebuild the spatial indexes on the output feature classes
+    for feature_class in [endpoints_features, midpoints_features]:
+        logger.info(f'Rebuilding spatial index for: {feature_class}')
+        arcpy.management.RebuildIndexes(input_database=feature_class)
+
+    # compress the file geodatabase
+    logger.info(f'Compressing file geodatabase: {out_gdb}')
+    arcpy.management.Compress(in_dataset=out_gdb)
+
+    logger.info('Data processing complete.')
